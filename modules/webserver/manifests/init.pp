@@ -8,21 +8,21 @@ class webserver (
 		) inherits ::webserver::parameters {
 	package { 'webserver-package':
 		name   => $packagename,	
-		ensure => installed
+		ensure => installed,
 	}
 
 	file { 'config-file':
 		path    => $configfile,
 		ensure  => file,
 		source  => $configsource,
-		require => Package['webserver-package']
+		require => Package['webserver-package'],
 	}
 		
 	file { 'vhost-file':
 		path    => $vhostfile,
 		ensure  => file,
 		content => template('webserver/vhost.conf.erb'),
-		require => Package['webserver-package']
+		require => Package['webserver-package'],
 	}
 
 	file { 'default-index':
@@ -38,10 +38,10 @@ class webserver (
 		enable     => true,
 		hasrestart => true,
 		require    => [ File['config-file'], File['vhost-file'] ],
-		subscribe  => [ File['config-file'], File['vhost-file'] ]
+		subscribe  => [ File['config-file'], File['vhost-file'] ],
 	}
 
-	package { [ 'ruby', 'cowsay', 'htop', 'vim', 'iotop', 'sudo', 'systemd', 'net-tools' ]:
+	package { [ 'ruby', 'cowsay', 'htop', 'vim', 'iotop', 'sudo', 'systemd', 'net-tools', ]:
 		ensure => installed,
 	}
 

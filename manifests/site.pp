@@ -1,0 +1,3 @@
+node /slave/ {
+	include webserver
+}

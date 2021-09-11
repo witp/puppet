@@ -1,0 +1,56 @@
+class webserver {
+	if $::osfamily == 'RedHat' {
+		package { 'httpd' :
+			ensure => present
+		}
+		
+		file { '/etc/httpd/conf/httpd.conf':
+			ensure  => file,
+			source  => 'puppet:///modules/webserver/httpd.conf',
+			require => Package['httpd'],
+		}
+		
+		file { '/etc/httpd/conf.d/vhost.conf':
+			ensure  => file,
+			content => template('webserver/vhost.conf.erb'),
+			require => Package['httpd'],
+		}
+
+		service { 'httpd':
+			ensure     => running,
+			enable     => true,
+			hasrestart => true,
+			require    => [ File['/etc/httpd/conf/httpd.conf'], File['/etc/httpd/conf.d/vhost.conf'] ]
+		}
+
+	} elsif $::osfamily == 'Debian' {
+		package { 'apache2' :
+			ensure => present
+		}
+
+		file { '/etc/apache2/apache2.conf':
+			ensure => file,
+			source => 'puppet:///modules/webserver/apache2.conf',
+			require => Package['apache2'],
+		}
+		
+		file { '/etc/apache2/sites-enabled/000-default.conf':
+			ensure  => file,
+			content => template('webserver/000-default.conf.erb'),
+			require => Package['apache2'],
+		}
+
+		file { '/var/www/html/index.html':
+			ensure  => file,
+			source => 'puppet:///modules/webserver/index.html',
+			require => Package['apache2'],
+		}
+
+		service { 'apache2':
+			ensure     => running,
+			enable     => true,
+			hasrestart => true,
+			require => Package['apache2'],
+		}
+	}
+}
